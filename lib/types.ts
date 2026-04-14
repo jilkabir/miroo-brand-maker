@@ -10,6 +10,21 @@ export type ContentIdea = {
   angle: string;
 };
 
+export type DetectedColor = {
+  hex: string;
+  hits: number;
+};
+
+export type ColorAudit = {
+  totalUniqueColors: number;
+  scannedPageCount: number;
+  scannedCssCount: number;
+  scannedPages: string[];
+  scannedCssFiles: string[];
+  topColors: DetectedColor[];
+  coverageNotes: string[];
+};
+
 export type BrandReport = {
   siteName: string;
   url: string;
@@ -24,4 +39,5 @@ export type BrandReport = {
   contentIdeas: ContentIdea[];
   sampleCaptions: string[];
   recommendations: string[];
+  colorAudit?: ColorAudit;
 };

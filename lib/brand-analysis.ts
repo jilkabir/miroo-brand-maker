@@ -2,12 +2,27 @@ import { buildMockReport } from "@/lib/mock-report";
 import { buildSiteIntel } from "@/lib/site-intel";
 import { BrandReport } from "@/lib/types";
 
+function enrichWithAudit(report: BrandReport, siteIntel: Awaited<ReturnType<typeof buildSiteIntel>>): BrandReport {
+  return {
+    ...report,
+    colorAudit: {
+      totalUniqueColors: siteIntel.allDetectedColors.length,
+      scannedPageCount: siteIntel.scannedPages.length,
+      scannedCssCount: siteIntel.scannedCssFiles.length,
+      scannedPages: siteIntel.scannedPages,
+      scannedCssFiles: siteIntel.scannedCssFiles,
+      topColors: siteIntel.allDetectedColors.slice(0, 30),
+      coverageNotes: siteIntel.notes
+    }
+  };
+}
+
 export async function analyzeBrand(url: string): Promise<BrandReport> {
   const apiKey = process.env.OPENAI_API_KEY;
   const siteIntel = await buildSiteIntel(url);
 
   if (!apiKey) {
-    return buildMockReport(url, siteIntel);
+    return enrichWithAudit(buildMockReport(url, siteIntel), siteIntel);
   }
 
   try {
@@ -26,7 +41,7 @@ export async function analyzeBrand(url: string): Promise<BrandReport> {
               {
                 type: "input_text",
                 text:
-                  "You are a brand strategist. Return valid JSON only. Use provided site intelligence as the source of truth, not generic assumptions. Include siteName, niche, personality array, audience, summary, currentPalette, suggestedPalette, contentPillars, socialTone, contentIdeas, sampleCaptions, recommendations. Each palette item must include label, hex, usage. Each content idea must include title, format, angle."
+                  "You are a brand strategist. Return valid JSON only. Use provided site intelligence as the source of truth, not generic assumptions. Use detected colors from intelligence when building currentPalette and suggestedPalette. Include siteName, niche, personality array, audience, summary, currentPalette, suggestedPalette, contentPillars, socialTone, contentIdeas, sampleCaptions, recommendations. Each palette item must include label, hex, usage. Each content idea must include title, format, angle."
               }
             ]
           },
@@ -118,21 +133,24 @@ export async function analyzeBrand(url: string): Promise<BrandReport> {
     });
 
     if (!response.ok) {
-      return buildMockReport(url, siteIntel);
+      return enrichWithAudit(buildMockReport(url, siteIntel), siteIntel);
     }
 
     const data = await response.json();
     const raw = data.output_text || data.output?.[0]?.content?.[0]?.text;
 
     if (!raw) {
-      return buildMockReport(url, siteIntel);
+      return enrichWithAudit(buildMockReport(url, siteIntel), siteIntel);
     }
 
-    return {
+    return enrichWithAudit(
+      {
       ...JSON.parse(raw),
       url
-    } as BrandReport;
+      } as BrandReport,
+      siteIntel
+    );
   } catch {
-    return buildMockReport(url, siteIntel);
+    return enrichWithAudit(buildMockReport(url, siteIntel), siteIntel);
   }
 }

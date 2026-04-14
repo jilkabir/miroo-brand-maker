@@ -67,6 +67,89 @@ async function AnalyzeContent({ url }: { url: string }) {
           <PaletteCard title="Suggested Palette" palette={report.suggestedPalette} />
         </div>
 
+        {report.colorAudit ? (
+          <SectionCard title="Detailed Color Audit" eyebrow="Detection report">
+            <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+              <div className="space-y-4">
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="rounded-[1.2rem] bg-white p-4">
+                    <p className="text-xs uppercase tracking-[0.18em] text-black/50">Unique Colors</p>
+                    <p className="mt-2 text-2xl font-semibold">{report.colorAudit.totalUniqueColors}</p>
+                  </div>
+                  <div className="rounded-[1.2rem] bg-white p-4">
+                    <p className="text-xs uppercase tracking-[0.18em] text-black/50">Pages Scanned</p>
+                    <p className="mt-2 text-2xl font-semibold">{report.colorAudit.scannedPageCount}</p>
+                  </div>
+                  <div className="rounded-[1.2rem] bg-white p-4">
+                    <p className="text-xs uppercase tracking-[0.18em] text-black/50">CSS Scanned</p>
+                    <p className="mt-2 text-2xl font-semibold">{report.colorAudit.scannedCssCount}</p>
+                  </div>
+                </div>
+
+                <div className="rounded-[1.4rem] bg-white p-4">
+                  <p className="mb-3 text-sm font-semibold text-black/70">Detected Colors (Top 30)</p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {report.colorAudit.topColors.map((color) => (
+                      <div
+                        key={color.hex}
+                        className="flex items-center justify-between rounded-xl border border-black/8 px-3 py-2"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="h-7 w-7 rounded-md border border-black/10"
+                            style={{ backgroundColor: color.hex }}
+                          />
+                          <code className="text-sm">{color.hex}</code>
+                        </div>
+                        <span className="text-xs text-black/55">{color.hits} hits</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="rounded-[1.4rem] bg-white p-4">
+                  <p className="mb-3 text-sm font-semibold text-black/70">Scanned Pages</p>
+                  <div className="space-y-2">
+                    {report.colorAudit.scannedPages.map((page) => (
+                      <p key={page} className="truncate text-xs text-black/60">
+                        {page}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-[1.4rem] bg-white p-4">
+                  <p className="mb-3 text-sm font-semibold text-black/70">Scanned CSS Files</p>
+                  <div className="space-y-2">
+                    {report.colorAudit.scannedCssFiles.length ? (
+                      report.colorAudit.scannedCssFiles.map((css) => (
+                        <p key={css} className="truncate text-xs text-black/60">
+                          {css}
+                        </p>
+                      ))
+                    ) : (
+                      <p className="text-xs text-black/50">No public CSS files detected from scanned pages.</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-[1.4rem] bg-white p-4">
+                  <p className="mb-3 text-sm font-semibold text-black/70">Coverage Notes</p>
+                  <div className="space-y-2">
+                    {report.colorAudit.coverageNotes.map((note) => (
+                      <p key={note} className="text-xs text-black/60">
+                        {note}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </SectionCard>
+        ) : null}
+
         <div className="grid gap-6 lg:grid-cols-2">
           <SectionCard title="Content Pillars" eyebrow="Strategy">
             <div className="space-y-3">

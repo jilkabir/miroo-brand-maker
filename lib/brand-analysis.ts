@@ -4,13 +4,13 @@ import { BrandReport } from "@/lib/types";
 
 export async function analyzeBrand(url: string): Promise<BrandReport> {
   const apiKey = process.env.OPENAI_API_KEY;
+  const siteIntel = await buildSiteIntel(url);
 
   if (!apiKey) {
-    return buildMockReport(url);
+    return buildMockReport(url, siteIntel);
   }
 
   try {
-    const siteIntel = buildSiteIntel(url);
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
@@ -26,7 +26,7 @@ export async function analyzeBrand(url: string): Promise<BrandReport> {
               {
                 type: "input_text",
                 text:
-                  "You are a brand strategist. Return valid JSON only. Analyze the given website hostname and infer a likely digital branding direction. Include siteName, niche, personality array, audience, summary, currentPalette, suggestedPalette, contentPillars, socialTone, contentIdeas, sampleCaptions, recommendations. Each palette item must include label, hex, usage. Each content idea must include title, format, angle."
+                  "You are a brand strategist. Return valid JSON only. Use provided site intelligence as the source of truth, not generic assumptions. Include siteName, niche, personality array, audience, summary, currentPalette, suggestedPalette, contentPillars, socialTone, contentIdeas, sampleCaptions, recommendations. Each palette item must include label, hex, usage. Each content idea must include title, format, angle."
               }
             ]
           },
@@ -118,14 +118,14 @@ export async function analyzeBrand(url: string): Promise<BrandReport> {
     });
 
     if (!response.ok) {
-      return buildMockReport(url);
+      return buildMockReport(url, siteIntel);
     }
 
     const data = await response.json();
     const raw = data.output_text || data.output?.[0]?.content?.[0]?.text;
 
     if (!raw) {
-      return buildMockReport(url);
+      return buildMockReport(url, siteIntel);
     }
 
     return {
@@ -133,6 +133,6 @@ export async function analyzeBrand(url: string): Promise<BrandReport> {
       url
     } as BrandReport;
   } catch {
-    return buildMockReport(url);
+    return buildMockReport(url, siteIntel);
   }
 }

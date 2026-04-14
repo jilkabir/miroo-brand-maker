@@ -1,4 +1,5 @@
 import { BrandReport } from "@/lib/types";
+import { SiteIntel } from "@/lib/site-intel";
 import { getHostname } from "@/lib/url";
 
 function titleFromHost(host: string): string {
@@ -9,29 +10,40 @@ function titleFromHost(host: string): string {
     .join(" ");
 }
 
-export function buildMockReport(url: string): BrandReport {
+function fallbackPalette(colors: string[]) {
+  const [c1, c2, c3, c4] = colors;
+  return {
+    current: [
+      { label: "Detected Base", hex: c1 || "#1B1F3B", usage: "Header, logo, navigation" },
+      { label: "Detected Accent", hex: c2 || "#F4A261", usage: "Buttons, highlights" },
+      { label: "Detected Neutral", hex: c3 || "#FAF7F2", usage: "Background and breathing space" }
+    ],
+    suggested: [
+      { label: "Primary", hex: c1 || "#0D3B66", usage: "Core brand color for authority" },
+      { label: "Secondary", hex: c2 || "#F4D35E", usage: "Warm energy for contrast and CTAs" },
+      { label: "Accent", hex: c4 || "#EE6C4D", usage: "Short bursts of attention on cards and social" },
+      { label: "Neutral", hex: c3 || "#F7F4EA", usage: "Background, calm sections, templates" }
+    ]
+  };
+}
+
+export function buildMockReport(url: string, siteIntel?: SiteIntel): BrandReport {
   const host = getHostname(url);
-  const siteName = titleFromHost(host);
+  const siteName = siteIntel?.siteName || titleFromHost(host);
+  const palette = fallbackPalette(siteIntel?.detectedColors || []);
+  const niche = siteIntel?.guessedCategory || "Modern service brand";
+  const summaryLead = siteIntel?.description || siteIntel?.title || siteName;
 
   return {
     siteName,
     url,
-    niche: "Modern service brand",
+    niche,
     personality: ["clean", "confident", "human", "strategic"],
     audience: "Founders and growing businesses who want a polished digital brand",
     summary:
-      "Miroo sees a modern, service-led brand opportunity here. The recommended direction keeps the identity trustworthy and premium while making social content easier to scale across Instagram, LinkedIn, and short-form video.",
-    currentPalette: [
-      { label: "Detected Base", hex: "#1B1F3B", usage: "Header, logo, navigation" },
-      { label: "Detected Accent", hex: "#F4A261", usage: "Buttons, highlights" },
-      { label: "Detected Neutral", hex: "#FAF7F2", usage: "Background and breathing space" }
-    ],
-    suggestedPalette: [
-      { label: "Primary", hex: "#0D3B66", usage: "Core brand color for authority" },
-      { label: "Secondary", hex: "#F4D35E", usage: "Warm energy for contrast and CTAs" },
-      { label: "Accent", hex: "#EE6C4D", usage: "Short bursts of attention on cards and social" },
-      { label: "Neutral", hex: "#F7F4EA", usage: "Background, calm sections, templates" }
-    ],
+      `${summaryLead}. Miroo sees a strong opportunity to sharpen positioning and make social content more consistent across Instagram, LinkedIn, and short-form video.`,
+    currentPalette: palette.current,
+    suggestedPalette: palette.suggested,
     contentPillars: [
       "Quick educational tips that simplify branding decisions",
       "Before and after design breakdowns",

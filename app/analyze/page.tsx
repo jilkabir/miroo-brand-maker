@@ -189,6 +189,35 @@ async function AnalyzeContent({ url }: { url: string }) {
           </div>
         </SectionCard>
 
+        {report.socialMediaPlan?.length ? (
+          <SectionCard title="Platform-Wise Social Strategy" eyebrow="Execution plan">
+            <div className="grid gap-4 md:grid-cols-2">
+              {report.socialMediaPlan.map((plan) => (
+                <article key={plan.platform} className="rounded-[1.6rem] border border-black/8 bg-white p-5">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h4 className="text-lg font-semibold">{plan.platform}</h4>
+                    <span className="rounded-full bg-sand px-3 py-1 text-xs font-semibold text-ink">
+                      {plan.postingFrequency}
+                    </span>
+                  </div>
+                  <p className="text-sm leading-6 text-black/70">{plan.objective}</p>
+                  <div className="mt-4 space-y-3 text-sm">
+                    <p className="text-black/72">
+                      <span className="font-semibold">Formats:</span> {plan.formats.join(", ")}
+                    </p>
+                    <p className="text-black/72">
+                      <span className="font-semibold">Content Mix:</span> {plan.contentMix.join(" | ")}
+                    </p>
+                    <p className="text-black/72">
+                      <span className="font-semibold">CTA style:</span> {plan.ctaStyle}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </SectionCard>
+        ) : null}
+
         <SectionCard title="Sample Captions" eyebrow="Copy direction">
           <div className="grid gap-4 md:grid-cols-3">
             {report.sampleCaptions.map((caption) => (

@@ -1,9 +1,56 @@
 import { buildMockReport } from "@/lib/mock-report";
 import { buildSiteIntel } from "@/lib/site-intel";
-import { BrandReport } from "@/lib/types";
+import { BrandReport, SocialPlatformPlan } from "@/lib/types";
+
+function defaultSocialPlan(): SocialPlatformPlan[] {
+  return [
+    {
+      platform: "Instagram",
+      objective: "Grow visual identity recall",
+      postingFrequency: "4 posts/week",
+      formats: ["Carousel", "Reel"],
+      contentMix: ["Educational tips", "Before-after", "Proof posts"],
+      ctaStyle: "Save this post for your next brand update."
+    },
+    {
+      platform: "Facebook",
+      objective: "Trust-building with broad audience",
+      postingFrequency: "3 posts/week",
+      formats: ["Short video", "Image post", "Poll"],
+      contentMix: ["How-to", "Community stories", "Offer reminder"],
+      ctaStyle: "Comment your brand niche for a tailored suggestion."
+    },
+    {
+      platform: "LinkedIn",
+      objective: "Authority and inbound leads",
+      postingFrequency: "3 posts/week",
+      formats: ["Thought post", "Case insight", "Framework thread"],
+      contentMix: ["Industry perspective", "Actionable framework", "Proof"],
+      ctaStyle: "DM for a focused brand teardown."
+    },
+    {
+      platform: "TikTok",
+      objective: "Discovery through short-form education",
+      postingFrequency: "4 videos/week",
+      formats: ["Talking head", "Visual audit"],
+      contentMix: ["Quick tips", "Brand reactions", "Mini CTA"],
+      ctaStyle: "Follow for practical brand tips every week."
+    }
+  ];
+}
+
+function withSocialPlan(report: BrandReport): BrandReport {
+  return {
+    ...report,
+    socialMediaPlan:
+      report.socialMediaPlan && report.socialMediaPlan.length
+        ? report.socialMediaPlan
+        : defaultSocialPlan()
+  };
+}
 
 function enrichWithAudit(report: BrandReport, siteIntel: Awaited<ReturnType<typeof buildSiteIntel>>): BrandReport {
-  return {
+  return withSocialPlan({
     ...report,
     colorAudit: {
       totalUniqueColors: siteIntel.allDetectedColors.length,
@@ -14,7 +61,7 @@ function enrichWithAudit(report: BrandReport, siteIntel: Awaited<ReturnType<type
       topColors: siteIntel.allDetectedColors.slice(0, 30),
       coverageNotes: siteIntel.notes
     }
-  };
+  });
 }
 
 export async function analyzeBrand(url: string): Promise<BrandReport> {
@@ -41,7 +88,7 @@ export async function analyzeBrand(url: string): Promise<BrandReport> {
               {
                 type: "input_text",
                 text:
-                  "You are a brand strategist. Return valid JSON only. Use provided site intelligence as the source of truth, not generic assumptions. Use detected colors from intelligence when building currentPalette and suggestedPalette. Include siteName, niche, personality array, audience, summary, currentPalette, suggestedPalette, contentPillars, socialTone, contentIdeas, sampleCaptions, recommendations. Each palette item must include label, hex, usage. Each content idea must include title, format, angle."
+                  "You are a brand strategist. Return valid JSON only. Use provided site intelligence as the source of truth, not generic assumptions. Use detected colors from intelligence when building currentPalette and suggestedPalette. Include siteName, niche, personality array, audience, summary, currentPalette, suggestedPalette, contentPillars, socialTone, socialMediaPlan, contentIdeas, sampleCaptions, recommendations. Each palette item must include label, hex, usage. Each content idea must include title, format, angle. socialMediaPlan must include Instagram, Facebook, LinkedIn, and TikTok objects with platform, objective, postingFrequency, formats, contentMix, ctaStyle."
               }
             ]
           },
@@ -96,6 +143,29 @@ export async function analyzeBrand(url: string): Promise<BrandReport> {
                 },
                 contentPillars: { type: "array", items: { type: "string" } },
                 socialTone: { type: "array", items: { type: "string" } },
+                socialMediaPlan: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    additionalProperties: false,
+                    properties: {
+                      platform: { type: "string" },
+                      objective: { type: "string" },
+                      postingFrequency: { type: "string" },
+                      formats: { type: "array", items: { type: "string" } },
+                      contentMix: { type: "array", items: { type: "string" } },
+                      ctaStyle: { type: "string" }
+                    },
+                    required: [
+                      "platform",
+                      "objective",
+                      "postingFrequency",
+                      "formats",
+                      "contentMix",
+                      "ctaStyle"
+                    ]
+                  }
+                },
                 contentIdeas: {
                   type: "array",
                   items: {
@@ -122,6 +192,7 @@ export async function analyzeBrand(url: string): Promise<BrandReport> {
                 "suggestedPalette",
                 "contentPillars",
                 "socialTone",
+                "socialMediaPlan",
                 "contentIdeas",
                 "sampleCaptions",
                 "recommendations"
@@ -145,8 +216,8 @@ export async function analyzeBrand(url: string): Promise<BrandReport> {
 
     return enrichWithAudit(
       {
-      ...JSON.parse(raw),
-      url
+        ...JSON.parse(raw),
+        url
       } as BrandReport,
       siteIntel
     );

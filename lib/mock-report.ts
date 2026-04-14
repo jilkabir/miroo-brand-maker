@@ -55,6 +55,40 @@ export function buildMockReport(url: string, siteIntel?: SiteIntel): BrandReport
       "Visual, crisp, and easy to skim",
       "Helpful first, promotional second"
     ],
+    socialMediaPlan: [
+      {
+        platform: "Instagram",
+        objective: "Build visual brand recall and consistent engagement",
+        postingFrequency: "4 posts/week + 3 stories/week",
+        formats: ["Carousel", "Reel", "Story Q&A"],
+        contentMix: ["40% educational tips", "30% portfolio/before-after", "20% proof", "10% offer"],
+        ctaStyle: "Save this for your next brand refresh."
+      },
+      {
+        platform: "Facebook",
+        objective: "Community trust and shareable educational reach",
+        postingFrequency: "3 posts/week",
+        formats: ["Image post", "Short video", "Poll"],
+        contentMix: ["50% how-to", "30% case stories", "20% conversion content"],
+        ctaStyle: "Comment your brand niche for a free quick direction."
+      },
+      {
+        platform: "LinkedIn",
+        objective: "Authority building and lead generation",
+        postingFrequency: "3 posts/week",
+        formats: ["Founder insight", "Case study thread", "Opinion post"],
+        contentMix: ["45% thought leadership", "35% practical framework", "20% offer/proof"],
+        ctaStyle: "DM for a tailored brand teardown."
+      },
+      {
+        platform: "TikTok",
+        objective: "Fast discovery with short educational videos",
+        postingFrequency: "4 short videos/week",
+        formats: ["Talking head", "Screen breakdown", "Trend remix"],
+        contentMix: ["60% quick tips", "25% audits", "15% CTA"],
+        ctaStyle: "Follow for daily brand fixes in under 30 seconds."
+      }
+    ],
     contentIdeas: [
       {
         title: "3 color mistakes making your brand look inconsistent",

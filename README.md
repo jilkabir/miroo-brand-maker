@@ -9,6 +9,7 @@ Miroo Brand Maker is a Vercel-ready Next.js app that turns a website URL into a 
 - suggests current and improved color directions
 - scans multiple pages and CSS files to detect detailed color usage
 - proposes social tone, content ideas, and caption samples
+- includes platform-wise social media strategy suggestions
 - keeps the codebase simple so future updates with Claude are easy
 
 ## Stack

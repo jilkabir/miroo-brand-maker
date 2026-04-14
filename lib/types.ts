@@ -10,6 +10,15 @@ export type ContentIdea = {
   angle: string;
 };
 
+export type SocialPlatformPlan = {
+  platform: string;
+  objective: string;
+  postingFrequency: string;
+  formats: string[];
+  contentMix: string[];
+  ctaStyle: string;
+};
+
 export type DetectedColor = {
   hex: string;
   hits: number;
@@ -36,6 +45,7 @@ export type BrandReport = {
   suggestedPalette: PaletteColor[];
   contentPillars: string[];
   socialTone: string[];
+  socialMediaPlan?: SocialPlatformPlan[];
   contentIdeas: ContentIdea[];
   sampleCaptions: string[];
   recommendations: string[];
